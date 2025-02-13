@@ -1,0 +1,971 @@
+SQL Error: Duplicate entry '44' for key 'clients.PRIMARY' 
+Code: 1062 SQL: INSERT INTO Tp.clients (codecli,Rscli,SScli,ville,inscription) VALUES (?,?,?,?,?)unit uDM;
+
+{$mode ObjFPC}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, ZConnection, ZDataset, ZAbstractRODataset, DB,dialogs,DateUtils;
+
+type
+
+  { TDM }
+
+  TDM = class(TDataModule)
+    ZNX: TZConnection;
+    ZtblClassescomplet: TStringField;
+    Sceances: TZTable;
+    ZtblFormateurs: TZTable;
+    ZtblModules: TZTable;
+    ZtblClasses: TZTable;
+    ZtblClassesAnne_Scolaire: TStringField;
+    ZtblClassesCapacite: TLongintField;
+    ZtblClassesNombre_Fille: TLongintField;
+    ZtblClassesNombre_Garsson: TLongintField;
+    ZtblClassesObservations: TMemoField;
+    ZtblClassesType_Classe: TStringField;
+    ZtblFilieres: TZTable;
+    ZtblScolarite: TZTable;
+    ZtblScolariteAnne_Scolaire: TZRawStringField;
+    ZtblScolariteDebut: TZDateField;
+    ZtblScolariteFin: TZDateField;
+    ZtblScolariteArchive: TZRawStringField;
+    ZtblScolariteDate_Archive: TZDateField;
+    ZtblFilieresCode_Filiere: TZRawStringField;
+    ZtblFilieresNiveau: TZRawStringField;
+    ZtblFilieresNom_Filiere: TZRawStringField;
+    ZtblFilieresObservations: TZRawCLobField;
+    DSScolarite: TDataSource;
+    DSFilieres: TDataSource;
+    DSClasses: TDataSource;
+    ZtblModulesIdModule: TZIntegerField;
+    ZtblModulesNom_Module: TZRawStringField;
+    ZtblModulesScequences: TZIntegerField;
+    ZtblModulesMasse_Horaire: TZIntegerField;
+    ZtblModulesLabel_Module: TZRawStringField;
+    DSCours: TDataSource;
+    DDModules: TDataSource;
+    ZtblModulesCode_Filiere: TZRawStringField;
+    ZtblSequences: TZTable;
+    DSSequences: TDataSource;
+    ZtblSequencesidSequences: TZIntegerField;
+    ZtblSequencesintitule: TZRawStringField;
+    ZtblSequencesPrevue_Horaire: TZIntegerField;
+    ZtblSequencesIdModule: TZIntegerField;
+    ZtblSceances: TZTable;
+    DsSceances: TDataSource;
+    ZtblSceancesCode_Cours: TZIntegerField;
+    ZtblSceancesIdClasses: TZIntegerField;
+    ZtblSceancesAnne_Scolaire: TZRawStringField;
+    ZtblSceancesCode_Filiere: TZRawStringField;
+    ZtblSceancesCin_Formateur: TZRawStringField;
+    ZtblSceancesidSequences: TZIntegerField;
+    ZtblSceancesIdModule: TZIntegerField;
+    ZtblSceancesFin: TZTimeField;
+    ZtblSceancesDebut: TZTimeField;
+    ZtblSceancesJour: TZDateField;
+    ZtblSceancesDeroulement: TZRawCLobField;
+    ZtblSceancesObservation_Fin: TZRawCLobField;
+    ZtblSceancesDesposition: TZRawCLobField;
+    ZtblSceancesNB_Heure: TZIntegerField;
+    ZtblSceancesCumul: TZIntegerField;
+    ZtblSequencesOrdre_Sequence: TZSmallIntField;
+    DSFormateurs: TDataSource;
+    SceancesCode_Cours: TZIntegerField;
+    SceancesIdClasses: TZIntegerField;
+    SceancesAnne_Scolaire: TZRawStringField;
+    SceancesCode_Filiere: TZRawStringField;
+    SceancesCin_Formateur: TZRawStringField;
+    SceancesidSequences: TZIntegerField;
+    SceancesIdModule: TZIntegerField;
+    SceancesFin: TZTimeField;
+    SceancesDebut: TZTimeField;
+    SceancesJour: TZDateField;
+    SceancesDeroulement: TZRawCLobField;
+    SceancesObservation_Fin: TZRawCLobField;
+    SceancesDesposition: TZRawCLobField;
+    SceancesNB_Heure: TZIntegerField;
+    SceancesCumul: TZIntegerField;
+    Modules_Seqences: TZTable;
+    DSModules_Seqences: TDataSource;
+    ZtblStagiaires: TZTable;
+    DSStagiaires: TDataSource;
+    ZtblAffectations: TZTable;
+    DSAffectations: TDataSource;
+    ZtblClasses_read: TZTable;
+    DSClasses_read: TDataSource;
+    ZtblAffectationsCin_Formateur: TZRawStringField;
+    ZtblAffectationsIdClasses: TZIntegerField;
+    ZtblAffectationsAnne_Scolaire: TZRawStringField;
+    ZtblAffectationsCode_Filiere: TZRawStringField;
+    ZtblAffectationsDate_Affectation: TZDateField;
+    ZtblAffectationsDate_Completion: TZDateField;
+    Ztbenseignement: TZTable;
+    DSEnseignement: TDataSource;
+    ZtbenseignementIdModule: TZIntegerField;
+    ZtbenseignementCin_Formateur: TZRawStringField;
+    ZtbenseignementIdClasses: TZIntegerField;
+    ZtbenseignementAnne_Scolaire: TZRawStringField;
+    ZtbenseignementCode_Filiere: TZRawStringField;
+    ZtblEcheanciers: TZTable;
+    DDEcheanciers: TDataSource;
+    ZtblEcheanciersEcheancier: TZRawStringField;
+    ZtblEcheanciersduree: TZShortIntField;
+    ZtblEcheanciersFacteur: TZSmallIntField;
+    ZtblEcheanciersDescrive_echeancier: TStringField;
+    ZtblEcheanciersObservation: TZRawStringField;
+    DSEcheances: TDataSource;
+    ZtblEtat_Stagiaires: TZTable;
+    DSEtat_Stagiaires: TDataSource;
+    ZtblEtat_StagiairesEtat_Inscrit: TZRawStringField;
+    ZtblEtat_StagiairesInscrit: TZShortIntField;
+    ZtblEtat_StagiairesCode_Stagiaire: TZRawStringField;
+    ZtblEtat_StagiairesNom: TZRawStringField;
+    ZtblEtat_StagiairesPrenom: TZRawStringField;
+    ZtblEtat_Stagiairesinscrit_sys: TZShortIntField;
+    ZtblClassesGroupe: TZRawStringField;
+    ZtblClassesCode_Filiere: TZRawStringField;
+    ZtblClassesIdClasses: TZRawStringField;
+    ZtblEcheanciersautomatique: TZSmallIntField;
+    ZtblStagiairesCode_Stagiaire: TZIntegerField;
+    ZtblStagiairesCIN_Stagiaire: TZRawStringField;
+    ZtblStagiairesCNE: TZRawStringField;
+    ZtblStagiairesN_Inscription: TZRawStringField;
+    ZtblStagiairesNom: TZRawStringField;
+    ZtblStagiairesPrenom: TZRawStringField;
+    ZtblStagiairesNaissance: TZDateField;
+    ZtblStagiairesNiveau_scolaire: TZRawStringField;
+    ZtblStagiairesGsm: TZRawStringField;
+    ZtblStagiairesAdresse: TZRawStringField;
+    ZtblStagiairesinscrit: TZShortIntField;
+    ZtblStagiairesinscrit_sys: TZShortIntField;
+    ZtblStagiairesinscrit_sys_date: TZDateTimeField;
+    ZtblStagiairesinscrit_sys_code: TZRawStringField;
+    ZtblStagiairesLieu_Naissance: TZRawStringField;
+    ZtblStagiairesDate_Niveau_Scolaire: TZDateField;
+    ZtblStagiairesEtablissement_Scolaire: TZRawStringField;
+    ZtblStagiairesSexe: TZRawStringField;
+    ZtblStagiairesEmail: TZRawStringField;
+    ZtblStagiairesNom_Complet_Tuteur: TZRawStringField;
+    ZtblStagiairesProffesion_Tuteur: TZRawStringField;
+    ZtblStagiairesAdresse_Tuteur: TZRawStringField;
+    ZtblStagiairesTel_Tuteur: TZRawStringField;
+    ZtblStagiairesInternet_4G: TZShortIntField;
+    ZtblStagiairesInternet_wifi: TZShortIntField;
+    ZtblStagiairesInternet_fibre: TZShortIntField;
+    ZtblStagiairesInternet_Adsl: TZShortIntField;
+    ZtblStagiairesOrdinateur: TZShortIntField;
+    ZtblStagiairesSmart_Phone: TZShortIntField;
+    ZtblStagiairesTablette: TZShortIntField;
+    ZtblStagiairesAutes: TZRawStringField;
+    ZtblClassesNom_Classe: TZRawStringField;
+    ZtblClasses_readType_Classe: TZRawStringField;
+    ZtblClasses_readRead_classe: TZRawStringField;
+    ZtblClasses_readIdClasses: TZIntegerField;
+    ZtblClasses_readAnne_Scolaire: TZRawStringField;
+    ZtblClasses_readCode_Filiere: TZRawStringField;
+    ZtblClasses_readNom_Filiere: TZRawStringField;
+    ZtblPhoto: TZTable;
+    ZtblPhotoOrdrePhoto: TZIntegerField;
+    ZtblPhotoPhoto: TZBlobField;
+    ZtblPhotoCode_Stagiaire: TZIntegerField;
+    DSPhotos: TDataSource;
+    ZtblInscriptionsOrdreInscriptions: TZIntegerField;
+    ZtblInscriptionsDate_Inscription: TZDateField;
+    ZtblInscriptionsAssurance: TZDoubleField;
+    ZtblInscriptionsIdClasses: TZIntegerField;
+    ZtblInscriptionsCode_Stagiaire: TZIntegerField;
+    ZtblInscriptionsAnne_Scolaire: TZRawStringField;
+    ZtblPaiementsordre_ec: TZIntegerField;
+    ZtblPaiementsMontant: TZDoubleField;
+    ZtblPaiementsDate_paiement: TZDateField;
+    ZtblPaiementsMoyen_paiement: TZRawStringField;
+    ZtblPaiementsDocument_paiement: TZRawStringField;
+    ZtblPaiementsCode_Document: TZRawStringField;
+    ZtblPaiementsObservations: TZRawCLobField;
+    ZtblPaiementsEcheancier: TZRawStringField;
+    ZtblPaiementsCode_Stagiaire: TZRawStringField;
+    ZtblPaiementsIdClasses: TZRawStringField;
+    ZtblPaiementsAnne_Scolaire: TZRawStringField;
+    ZtblPaiementsEcheances_Code_Filiere: TZRawStringField;
+    ZtblEcheances: TZTable;
+    ZtblEcheancesordre_ec: TZIntegerField;
+    ZtblEcheancesOrdreEcheance: TZShortIntField;
+    ZtblEcheancesEcheancier: TZRawStringField;
+    ZtblEcheancesDate_Honnoration: TZDateField;
+    ZtblEcheancesHonoraire: TZDoubleField;
+    ZtblEcheancesReste_Payer: TZDoubleField;
+    ZtblEcheancesOrdreInscriptions: TZIntegerField;
+    ZtblInscriptions: TZTable;
+    DSInscriptions: TDataSource;
+    ZTblFonctionnaires: TZTable;
+    ZTblFonctionnairesNom: TZRawStringField;
+    ZTblFonctionnairesGsm: TZRawStringField;
+    ZTblFonctionnairesAdresse: TZRawCLobField;
+    ZTblFonctionnairesphoto: TZBlobField;
+    ZTblFonctionnairesCode_Fonct: TZRawStringField;
+    ZTblFonctionnairesFonction: TZRawStringField;
+    ZTblFonctionnairesPassword: TZRawStringField;
+    ZTblFonctionnairesActive: TZSmallIntField;
+    DSFonctionnaire: TDataSource;
+    procedure DataModuleCreate(Sender: TObject);
+    procedure ZtblClassesCalcFields(DataSet: TDataSet);
+    procedure ZtblClassesPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblFilieresDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblFilieresPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblFormateursDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblFormateursPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblModulesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblScolariteArchiveGetText(Sender: TField; var aText: string;
+      DisplayText: Boolean);
+    procedure ZtblScolariteDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblScolaritePostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblModulesPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblStagiairesPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblStagiairesBeforePost(DataSet: TDataSet);
+    procedure ZtblFormateursBeforePost(DataSet: TDataSet);
+    procedure ZtblAffectationsPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblAffectationsBeforePost(DataSet: TDataSet);
+
+    procedure ZtblClassesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblSceancesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblSequencesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblClasses_readPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblAffectationsDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtbenseignementPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblInscriptionsPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblEcheanciersCalcFields(DataSet: TDataSet);
+    procedure ZtblEcheancesoldPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblPaiementsPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblEcheancesoldBeforePost(DataSet: TDataSet);
+    procedure ZtblStagiairesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblClassesBeforePost(DataSet: TDataSet);
+    procedure ZtblEcheanciersPostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblInscriptionsDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblPaiementsDeleteError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
+    procedure ZtblEcheanciersBeforePost(DataSet: TDataSet);
+    procedure ZtblStagiairesNaissanceValidate(Sender: TField);
+  private
+
+  public
+
+  end;
+
+var
+  DM: TDM;
+
+implementation
+
+{$R *.lfm}
+
+{ TDM }
+
+procedure TDM.ZtblScolaritePostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+var
+  message : string;
+  //Field Anne_Scolaire is required
+begin
+   message := 'Cannot delete or update a parent row: a foreign key constraint fails';
+   if pos('Field Anne_Scolaire is required',e.Message)<> 0 then
+   begin
+    ShowMessage('Année Scolaire Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+
+   if pos('Duplicate entry',e.Message)<> 0 then
+   begin
+    ShowMessage('Année Scolaire Dupliquée !');
+    DataAction := daAbort;
+    exit;
+   end;
+
+   if pos(message,e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Année Scolaire Utilisée Par Autres Tables');
+    exit;
+   end;
+end;
+
+procedure TDM.ZtblFilieresPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+var
+  message : String;
+begin
+ message := 'Cannot delete or update a parent row: a foreign key constraint fails';
+ if pos('Field Code_Filiere is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Code Filiere Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+ if pos('Field Niveau is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Niveau Filiere Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+ if pos('Field Nom_Filiere is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Nom Filiere Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+
+   if pos('Duplicate entry',e.Message)<> 0 then
+   begin
+    ShowMessage('Code Filiere Dupliquée !');
+    DataAction := daAbort;
+    exit
+   end;
+   if pos(message,e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Code Filiere Utilisée Par Autres Tables / Code Filiere Dupliquée  !');
+     if DataSet.State = dsEdit then
+       begin
+        DataSet.Cancel;
+        DataSet.edit;
+       end;
+    exit ;
+   end;
+end;
+
+procedure TDM.ZtblFormateursDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+var
+  cle : String;
+begin
+  cle := DataSet.FieldByName('Cin_Formateur').AsString;
+    if pos('Cannot delete',e.Message)<> 0 then
+     begin
+      ShowMessage('Operation Non Authorisée!');
+      DataAction := daAbort;
+     end;
+end;
+
+procedure TDM.ZtblFormateursPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+
+   if pos('Field Cin_Formateur is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Code Formateur Obligatoire');
+    DataAction := daAbort;
+    exit
+   end;
+   if pos('Duplicate entry '+quotedstr(DataSet.FieldByName('Cin_Formateur').AsString)+' for key ''Formateurs.PRIMARY''',e.Message)<> 0 then
+   begin
+    ShowMessage('Duplication Code Formateur');
+    DataAction := TDataAction.daAbort;
+    exit
+   end;
+   if pos('Field Nom is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Nom Obligatoire');
+    DataAction := daAbort;
+    exit
+   end;
+   {if pos('Field Prenom is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Prenom Obligatoire');
+    DataAction := TDataAction.daAbort;
+    exit
+   end;}
+   if pos('Duplicate entry '+quotedstr(DataSet.FieldByName('Gsm').AsString)+' for key ''Formateurs.Gsm_Formateur_UNIQUE''',e.Message)<> 0 then
+   begin
+    ShowMessage('Duplication Numero GSM');
+    DataAction := daAbort;
+    exit
+   end;
+end;
+
+procedure TDM.ZtblModulesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+var
+  cle : String;
+begin
+ cle := DataSet.FieldByName('idModule').AsString;
+
+    if pos('Cannot delete',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+      DataSet.Locate('idModule',cle,[loCaseInsensitive]);
+    end;
+end;
+
+procedure TDM.ZtblFilieresDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+
+    if pos('Cannot delete',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+    end;
+end;
+
+procedure TDM.ZtblClassesPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+ var
+message : string;
+begin
+   message := 'Cannot delete or update a parent row: a foreign key constraint fails';
+    if pos('Field Type_Classe is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Type De Classe Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+      if pos('Field Groupe is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Groupe De Classe Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+   if pos('Field Anne_Scolaire is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Anne Scolaire De La  Classe Est Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+   if pos('Field Code_Filiere is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Cod Filiere De La  Classe Est Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+   if pos('Field Nom_Classe is required, but not supplied',e.Message)<> 0 then
+   begin
+    ShowMessage('Nom Classe  Est Obligatoire !');
+     if DataSet.state in [dsEdit] then
+     begin
+      DataAction := daAbort;
+      DataSet.Cancel;
+      DataSet.edit
+     end
+       else
+       begin
+        DataAction := daAbort;
+      end;
+    exit;
+   end;
+   if pos('Duplicate entry',e.Message)<> 0 then
+   begin
+    ShowMessage('classe Dupliquéd Dupliquée !');
+    DataAction := daAbort;
+    exit;
+   end;
+
+   if pos(QuotedStr('Anne_Scolaire' )+' cannot be null',e.Message)<> 0 then
+   begin
+    ShowMessage('Année Scolaire Vide');
+     DataAction := daAbort;
+    exit;
+   end;
+   if pos(QuotedStr('Code_Filiere' )+' cannot be null',e.Message)<> 0 then
+   begin
+    ShowMessage('Code Filiere Vide');
+    DataAction := daAbort;
+    exit
+   end;
+
+
+end;
+
+procedure TDM.ZtblClassesCalcFields(DataSet: TDataSet);
+begin
+   {if(
+   DataSet.FieldByName('Capacite').AsInteger =
+   (DataSet.FieldByName('Nombre_Garsson').AsInteger + DataSet.FieldByName('Nombre_Fille').AsInteger))
+   then
+   begin
+     DataSet.FieldByName('complet').AsString  := 'Complet' ;
+   end else
+   begin
+      DataSet.FieldByName('complet').AsString  := 'InComplet' ;
+   end; }
+
+end;
+
+procedure TDM.DataModuleCreate(Sender: TObject);
+begin
+   try
+   ZNX.Connected := true;
+
+   except
+     ShowMessage('Serveur NoN Active');
+   end;
+end;
+
+procedure TDM.ZtblScolariteArchiveGetText(Sender: TField; var aText: string;
+  DisplayText: Boolean);
+begin
+    if (Sender.Value = '0') then aText :=  'En Instance'
+                        else aText :=  'Archivé';
+end;
+
+procedure TDM.ZtblScolariteDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+var message : string;
+begin
+    message :='Cannot delete or update a parent row: a foreign key constraint fails';
+   if pos(message,e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Module Utilisée Par Autres Tables !');
+    DataSet.Refresh;
+    exit
+   end;
+
+end;
+
+procedure TDM.ZtblModulesPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+
+begin
+
+   if pos('Modules.Nom_Module_UNIQUE',e.Message)<> 0 then
+   begin
+    ShowMessage('Nom Module Dupliquée !');
+    DataAction := daAbort;
+    exit
+   end;
+   if pos('Modules.Label_Module_UNIQUE',e.Message)<> 0 then
+   begin
+    ShowMessage('Lebele Module Dupliquée !');
+    DataAction := TDataAction.daAbort;
+    exit
+   end;
+
+end;
+
+procedure TDM.ZtblStagiairesPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+
+begin
+
+   if pos('Field Code_Stagiaire is required, but not supplied',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Code Stagiaire Obligatoire');
+    exit
+   end;
+   if pos('Duplicate entry '+quotedstr(DataSet.FieldByName('CIN_Stagiaire').AsString)+' for key ''Stagiaires.CIN_Stagiaire_UNIQUE''',e.Message)<> 0 then
+   begin
+    ShowMessage('Duplication Code Stagiaire');
+    DataAction := TDataAction.daAbort;
+    exit
+   end;
+   //if pos('Field Nom is required, but not supplied',e.Message)<> 0 then
+   //begin
+   // DataAction := daAbort;
+   // ShowMessage('Nom Obligatoire');
+   // exit
+   //end;
+   //if pos('Field Prenom is required, but not supplied',e.Message)<> 0 then
+   //begin
+   // DataAction := daAbort;
+   // ShowMessage('Prenom Obligatoire');
+   // exit
+   //end;
+   if pos('Duplicate entry '+quotedstr(DataSet.FieldByName('Gsm').AsString)+' for key ''Stagiaires.Gsm_Formateur_UNIQUE''',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Duplication Numero GSM');
+    exit
+   end;
+   if pos('Cannot delete or update a parent row: a foreign key constraint fails',e.Message)<> 0 then
+    begin
+     dataset.cancel;
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+      dataset.Edit;
+    end;
+end;
+
+procedure TDM.ZtblStagiairesBeforePost(DataSet: TDataSet);
+begin
+   //if (YearsBetween(Now,DataSet.FieldByName('Naissance').AsDateTime) < 14)
+   //then
+   //begin
+   //    ShowMessage('Le Stagiaire Doit Avoir Aumoin 14 Ans');
+   //    abort;
+   //end;
+
+
+end;
+
+procedure TDM.ZtblFormateursBeforePost(DataSet: TDataSet);
+begin
+  if (YearsBetween(Now,DataSet.FieldByName('Naissance').AsDateTime) < 18)
+   then
+   begin
+       ShowMessage('Le Formateur Doit Avoir Aumoin 18 Ans');
+       abort;
+   end;
+end;
+
+procedure TDM.ZtblAffectationsPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+var message : string;
+begin
+  if pos('for key ''Affectations.PRIMARY''',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Duplication De Classe ');
+    exit
+   end;
+   if pos('Field Date_Affectation is required, but not supplied',e.Message)<> 0 then
+   begin
+     DataAction:= daAbort;
+     ShowMessage('Date D''Affectation est Obligatoire');
+     exit;
+   end;
+
+
+  message := 'Cannot delete or update a parent row: a foreign key constraint fail';
+  if pos(message,e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    dataset.Cancel;
+    ShowMessage('Operation Non Authorisée : Classe Utilisée Par Autres Tables !');
+    exit
+   end;
+end;
+
+procedure TDM.ZtblAffectationsBeforePost(DataSet: TDataSet);
+begin
+  if (YearsBetween(Now,DataSet.FieldByName('Date_Affectation').AsDateTime) >= 1)
+   then
+   begin
+       ShowMessage('l''Affectation Ne peut Etre Enregistre QuePour CetvAnnée');
+       abort;
+   end;
+end;
+
+
+
+procedure TDM.ZtblClassesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  if pos('Cannot delete',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+    end;
+end;
+
+procedure TDM.ZtblSceancesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  if pos('Cannot delete',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+    end;
+end;
+
+procedure TDM.ZtblSequencesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  if pos('Cannot delete',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+    end;
+end;
+
+procedure TDM.ZtblClasses_readPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+end;
+
+procedure TDM.ZtblAffectationsDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+
+  if pos('Cannot delete',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+    end;
+end;
+
+procedure TDM.ZtbenseignementPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+   if pos('Duplicate entry',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Duplication D''Affectation De  Module Pour Ce Formateur');
+    if DataSet.State = dsEdit then DataSet.Cancel;
+    exit;
+   end;
+end;
+
+procedure TDM.ZtblInscriptionsPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  //Error: Duplicate entry
+  //Cannot add or update a child row: a foreign key constraint fails
+   if DataSet.State in [dsEdit] then
+    begin
+      if pos('SQL Error: Cannot delete or update a parent row: a foreign key constraint fails',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée !');
+     // DataSet.Cancel;
+    end;
+      exit;
+    end;
+
+   if pos('Duplicate entry',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Duplication D''Inscription en Meme filiere pour ce Satagiaire');
+    if DataSet.State = dsEdit then DataSet.Cancel;
+    exit;
+   end;
+   {if pos('Cannot add or update a child row: a foreign key constraint fails',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Duplication D''Inscription en Meme Année Scolaire');
+    if DataSet.State = dsEdit then DataSet.Cancel;
+    exit;
+   end; }
+
+end;
+
+procedure TDM.ZtblEcheanciersCalcFields(DataSet: TDataSet);
+var
+  Echeance : string;
+begin
+  //if DataSet.FieldByName('Echeancier').AsString = 'Comptant' then
+  //     Echeance :=  '  12 Mois'
+  //     else
+  //     Echeance :=  '  Mois' ;
+  //DataSet.FieldByName('Descrive_echeancier').AsString:=
+  //                      Concat(
+  //                           DataSet.FieldByName('Echeancier').AsString ,' -- En : ',
+  //                           DataSet.FieldByName('duree').AsString ,' Foix -- Par : ',
+  //                           DataSet.FieldByName('Facteur').AsString, Echeance
+  //                      );
+end;
+
+procedure TDM.ZtblEcheancesoldPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+
+end;
+
+procedure TDM.ZtblPaiementsPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+
+  if pos('Cannot add or update a child row:',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+      DataSet.Cancel;
+    end;
+
+end;
+
+procedure TDM.ZtblEcheancesoldBeforePost(DataSet: TDataSet);
+begin
+
+
+end;
+
+procedure TDM.ZtblStagiairesDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  if pos('Cannot delete or update a parent row: a foreign key constraint fails',e.Message)<> 0 then
+    begin
+      DataAction := daAbort;
+      ShowMessage('Operation Non Authorisée!');
+    end;
+end;
+
+
+
+procedure TDM.ZtblClassesBeforePost(DataSet: TDataSet);
+begin
+ // if DataSet.state in [dsInsert] then
+   //DataSet.FieldByName('IdClasses').AsString:=Concat(DataSet.FieldByName('Code_Filiere').AsString,'-',
+   DataSet.FieldByName('Nom_Classe').AsString:=Concat(DataSet.FieldByName('Code_Filiere').AsString,'-',
+                                          DataSet.FieldByName('Anne_Scolaire').AsString,'-',
+                                          DataSet.FieldByName('Type_Classe').AsString,'-',
+                                          DataSet.FieldByName('Groupe').AsString);
+end;
+
+procedure TDM.ZtblEcheanciersPostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+   if pos('Duplicate entry',e.Message)<> 0 then
+   begin
+    ShowMessage('Code Echeancier Dupliquée !');
+    DataAction := daAbort;
+    exit
+   end;
+end;
+
+procedure TDM.ZtblInscriptionsDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin //Cannot delete or update a parent row: a foreign key
+    if pos('Cannot delete or update a parent row: a foreign key',e.Message)<> 0 then
+   begin
+    DataAction := daAbort;
+    ShowMessage('Inscriptions Ne Peut Etre Supprimé !');
+    DataAction := daAbort;
+    exit;
+   end;
+end;
+
+procedure TDM.ZtblPaiementsDeleteError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  DataAction := daAbort;
+    ShowMessage('Paiement  Ne Peut Etre Supprimé !');
+    exit
+end;
+
+procedure TDM.ZtblEcheanciersBeforePost(DataSet: TDataSet);
+//var
+  //Echeance : String;
+begin
+    if DataSet.FieldByName('Echeancier').AsString = 'Personalisé' then
+   begin
+     DataSet.FieldByName('Descrive_echeancier').AsString:= 'Personalisé';
+     exit;
+   end  ;
+    if DataSet.FieldByName('Echeancier').AsString = 'Assurance' then
+   begin
+     DataSet.FieldByName('Descrive_echeancier').AsString:= 'Assurance';
+     exit;
+   end  ;
+   if DataSet.FieldByName('Echeancier').AsString = 'Comptant' then
+   begin
+     DataSet.FieldByName('Descrive_echeancier').AsString:= 'Paiement Pour 1Foix';
+     exit;
+   end ;
+
+      // Echeance :=  '  Mois' ;
+      // Echeance :=  '  12 Mois';
+    DataSet.FieldByName('Descrive_echeancier').AsString:=
+                        Concat(
+                            'En : ',
+                             DataSet.FieldByName('duree').AsString ,' Foix -- Par : ',
+                             DataSet.FieldByName('Facteur').AsString,'  Mois'
+                        );
+
+end;
+
+procedure TDM.ZtblStagiairesNaissanceValidate(Sender: TField);
+begin
+
+end;
+
+end.
+
